@@ -1,0 +1,2 @@
+# bidding-module
+bidding-module
