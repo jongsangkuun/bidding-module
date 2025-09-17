@@ -82,9 +82,9 @@ def place_bid(room_id: str, bidder_id: str, item_price: float) -> Bid:
 
     # 현재 최고 입찰 검사
     if bids:
-        current_highest = min(b["item_price"] for b in bids)
-        if item_price <= current_highest:
-            raise ValueError(f"item_price must be higher than current highest ({current_highest})")
+        current_lowest = min(b["item_price"] for b in bids)
+        if item_price <= current_lowest:
+            raise ValueError(f"item_price must be higher than current lowest ({current_lowest})")
     bid: Bid = {
         "dealer_id": bidder_id,
         "item_price": item_price,
@@ -111,13 +111,13 @@ def close_room(room_id: str) -> Optional[Dict[str, object]]:
         return None
     if not room.get("is_open", False):
         # 이미 닫혀 있으면 현재 상태를 반환
-        return {"room_id": room_id, "winner": get_highest_bid(room_id)}
+        return {"room_id": room_id, "winner": get_lowest_bid(room_id)}
     room["is_open"] = False
-    winner = get_highest_bid(room_id)
+    winner = get_lowest_bid(room_id)
     return {"room_id": room_id, "winner": winner}
 
 
-def get_highest_bid(room_id: str) -> Optional[Dict[str, object]]:
+def get_lowest_bid(room_id: str) -> Optional[Dict[str, object]]:
     """
     주어진 room_id의 최고 입찰(bid)을 반환합니다.
     반환되는 객체 예시: {"dealer_id": ..., "item_price": ..., "timestamp": ...} 또는 None
@@ -128,11 +128,11 @@ def get_highest_bid(room_id: str) -> Optional[Dict[str, object]]:
     bids: List[Bid] = room.get("bids", [])
     if not bids:
         return None
-    # 최고가 입찰(동일 금액이 여러개면 가장 먼저 올라온 것을 선택하려면 정렬/타임스탬프 비교 필요)
-    highest = min(bids, key=lambda b: b["item_price"])
+    # 최저가 입찰(동일 금액이 여러개면 가장 먼저 올라온 것을 선택하려면 정렬/타임스탬프 비교 필요)
+    lowest_bids = min(bids, key=lambda b: b["item_price"])
     # 반환 형식 통일
     return {
-        "dealer_id": highest["dealer_id"],
-        "amount": highest["item_price"],
-        "timestamp": highest["timestamp"],
+        "dealer_id": lowest_bids["dealer_id"],
+        "amount": lowest_bids["item_price"],
+        "timestamp": lowest_bids["timestamp"],
     }
