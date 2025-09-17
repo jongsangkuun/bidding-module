@@ -62,7 +62,7 @@ def get_room(room_id: str) -> Optional[Dict[str, object]]:
     """
     return _ROOMS.get(room_id)
 
-def place_bid(room_id: str, bidder_id: str, item_price: float) -> Bid:
+def place_bid(room_id: str, dealer_id: str, item_price: float) -> Bid:
     """
     입찰을 추가합니다. 유효하지 않으면 ValueError를 발생시킵니다.
     규칙(예시):
@@ -86,7 +86,7 @@ def place_bid(room_id: str, bidder_id: str, item_price: float) -> Bid:
         if item_price <= current_lowest:
             raise ValueError(f"item_price must be higher than current lowest ({current_lowest})")
     bid: Bid = {
-        "dealer_id": bidder_id,
+        "dealer_id": dealer_id,
         "item_price": item_price,
         "item_info": "",
         "item_option": "",
